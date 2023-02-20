@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +8,7 @@ typedef struct vector {
     int *arr;
 } vector;
 
+/// Geometrically increase capacity
 size_t calc_new_capacity(size_t old_capacity, size_t new_size) {
     if (old_capacity > SIZE_MAX - old_capacity / 2) return SIZE_MAX;
     const size_t new_capacity = old_capacity + old_capacity / 2;
@@ -14,6 +16,7 @@ size_t calc_new_capacity(size_t old_capacity, size_t new_size) {
     return new_capacity;
 }
 
+/// Add an element at the end
 void push_back(vector *self, int x) {
     if (self->size == self->capacity) {
         const size_t new_capacity = calc_new_capacity(self->capacity, self->size + 1);
@@ -26,8 +29,13 @@ void push_back(vector *self, int x) {
     self->arr[self->size++] = x;
 }
 
-void pop_back(vector *self) { self->size--; }
+/// Remove and element from the end
+void pop_back(vector *self) {
+    assert(self->size && "pop element on empty array!");
+    self->size--;
+}
 
+/// Reserve more capacity to git rid of reallocation when `push_back`
 void reserve(vector *self, size_t new_capacity) {
     if (new_capacity <= self->capacity) return; // `reserve` never shrinks
 
@@ -43,7 +51,7 @@ void reserve(vector *self, size_t new_capacity) {
 
 int main(int argc, const char *argv[]) {
     vector v;
-    v = vector_init();
+    v = vector_init(); // ctor
 
     reserve(&v, 1000);
 
@@ -53,5 +61,5 @@ int main(int argc, const char *argv[]) {
 
     printf("\nsize: %zu, capacity: %zu\n", v.size, v.capacity);
 
-    vector_destroy(v);
+    vector_destroy(v); // dtor
 }
